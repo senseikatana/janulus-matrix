@@ -147,12 +147,23 @@ async function viaMyMemory(
   source: LOCALE,
   target: LOCALE,
   fetchFn: typeof fetch,
-  timeoutMs: number
+  timeoutMs: number,
+  email?: string,
+  clientIp?: string
 ): Promise<string | null> {
   const { signal, done } = withTimeout(timeoutMs)
   try {
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`
-    const res = await fetchFn(url, { signal })
+    const params = new URLSearchParams({
+      q: text,
+      langpair: `${source}|${target}`
+    })
+    if (email) {
+      params.set('de', email)
+    }
+    if (clientIp) {
+      params.set('ip', clientIp)
+    }
+    const res = await fetchFn(`https://api.mymemory.translated.net/get?${params.toString()}`, { signal })
     if (!res.ok) {
       return null
     }
@@ -169,7 +180,7 @@ async function viaMyMemory(
 }
 
 async function resolveTarget(options: ChainOptions, target: LOCALE): Promise<{ value: string, provider: TranslationProvider }> {
-  const { text, source, googleApiKey, timeoutMs = DEFAULT_TIMEOUT, fetchFn = fetch } = options
+  const { text, source, googleApiKey, myMemoryEmail, clientIp, timeoutMs = DEFAULT_TIMEOUT, fetchFn = fetch } = options
   if (target === source) {
     return { value: text, provider: 'local' }
   }
@@ -185,7 +196,7 @@ async function resolveTarget(options: ChainOptions, target: LOCALE): Promise<{ v
   if (gtx && isPlausibleTranslation(gtx, text, target, source)) {
     return { value: gtx, provider: 'gtx' }
   }
-  const mem = await viaMyMemory(text, source, target, fetchFn, timeoutMs)
+  const mem = await viaMyMemory(text, source, target, fetchFn, timeoutMs, myMemoryEmail, clientIp)
   if (mem && isPlausibleTranslation(mem, text, target, source)) {
     return { value: mem, provider: 'mymemory' }
   }

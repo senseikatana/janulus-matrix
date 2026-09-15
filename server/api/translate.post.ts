@@ -33,6 +33,10 @@ export default defineEventHandler(async (event): Promise<TranslateResponse> => {
   const googleApiKey = typeof config.translateApiKey === 'string' && config.translateApiKey
     ? config.translateApiKey
     : undefined
+  const myMemoryEmail = typeof config.myMemoryEmail === 'string' && config.myMemoryEmail
+    ? config.myMemoryEmail
+    : undefined
+  const clientIp = getRequestIP(event, { xForwardedFor: true })
 
-  return await translateWithChain({ text, source, targets, googleApiKey })
+  return await translateWithChain({ text, source, targets, googleApiKey, myMemoryEmail, clientIp: clientIp ?? undefined })
 })

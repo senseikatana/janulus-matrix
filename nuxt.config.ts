@@ -9,6 +9,10 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
+    // Privadas (server-only): se mapean desde NUXT_TRANSLATE_API_KEY y
+    // NUXT_MYMEMORY_EMAIL. Vacías por default = cadena 100% gratis y anónima.
+    translateApiKey: '',
+    myMemoryEmail: '',
     public: {
       translateProvider: 'gtx'
     }
