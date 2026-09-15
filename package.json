@@ -1,16 +1,27 @@
 {
   "name": "janulus-matrix",
-  "version": "0.1.0",
-  "description": "Matriz Powell Janulus para intercambio mutuo Portugués (BR) ↔ Español",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck"
   },
-  "author": "senseikatana - Sergio Jurado",
-  "license": "MIT",
+  "dependencies": {
+    "@iconify-json/lucide": "^1.2.131",
+    "@iconify-json/simple-icons": "^1.2.95",
+    "@nuxt/ui": "^4.11.1",
+    "nuxt": "^4.5.2",
+    "tailwindcss": "^4.3.3"
+  },
   "devDependencies": {
-    "vite": "^6.2.0"
-  }
+    "@nuxt/eslint": "^1.17.0",
+    "eslint": "^10.10.0",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.11"
+  },
+  "packageManager": "pnpm@12.4.1"
 }

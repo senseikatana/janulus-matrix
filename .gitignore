@@ -1,46 +1,24 @@
-# Dependencias
-node_modules/
-.pnpm-store/
-.yarn/
-bun.lockb
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
 
-# Carpetas y archivos ocultos del sistema
-.*
-!.gitignore
-!.env.example
-!.prettierrc
-!.eslintrc.json
+# Node dependencies
+node_modules
 
-# Compilaciones y logs
-dist/
-build/
+# Logs
+logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-bun-debug.log*
 
-# Archivos de entorno
-.env
-.env.local
-.env.*.local
-
-# Cache
-.cache/
-.parcel-cache/
-.next/
-.nuxt/
-.output/
-coverage/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
+# Misc
 .DS_Store
-Thumbs.db
+.fleet
+.idea
 
+# Local env files
+.env
+.env.*
+!.env.example
