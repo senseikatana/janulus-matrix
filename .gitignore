@@ -41,3 +41,8 @@ logs
 .roo
 .trae
 .windsurf
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
