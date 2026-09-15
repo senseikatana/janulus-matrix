@@ -2,6 +2,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "janulus-matrix",
   "compatibility_date": "2026-08-15",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "observability": {
     "enabled": true
   },
@@ -9,5 +12,15 @@
   "assets": {
     "binding": "ASSETS",
     "directory": "./.output/public/"
-  }
+  },
+  // Hyperdrive "janulus-matrix-db" -> Postgres de InsForge (us-east).
+  // `wrangler dev` local exige string de conexión: va en `.dev.vars`
+  // (CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE), nunca acá.
+  // `wrangler dev --remote` usa el binding real sin nada local.
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "754397406bd44797b5ea40772bf6a0bb"
+    }
+  ]
 }

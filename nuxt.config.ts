@@ -30,7 +30,9 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    preset: "cloudflare_module",
+    // En Netlify (NETLIFY=true) Nitro debe usar el preset `netlify` (publica en dist/
+    // + functions en .netlify/). Un preset hardcodeado a cloudflare rompería el deploy.
+    preset: process.env.NETLIFY ? 'netlify' : 'cloudflare_module',
 
     cloudflare: {
       deployConfig: true,
