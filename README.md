@@ -25,6 +25,7 @@ Node 20+ y `pnpm@12.4.1`.
 
 ```bash
 pnpm install
+pnpm build:core            # genera los .d.ts de janulus-core (requerido para typecheck)
 cp .env.example .env   # opcional, solo si querés la API oficial de Google
 pnpm dev               # http://localhost:3000
 ```

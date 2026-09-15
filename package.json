@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
+    "build:core": "pnpm --filter janulus-core build",
     "dev": "nuxt dev",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
