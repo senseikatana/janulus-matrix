@@ -1,7 +1,11 @@
 {
   "name": "janulus-matrix",
+  "private": true,
+  "version": "0.1.2",
   "type": "module",
-  "version": "0.1.2"
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "nuxt build",
     "check:deploy": "node scripts/check-deploy.mjs",

@@ -13,23 +13,24 @@ Matriz ToDo de frases y vocabulario **PT ↔ ES ↔ EN ↔ CA ↔ GL** con tradu
 
 ## Requisitos
 
-Node 20+ y `pnpm@12.4.1`.
+Node 22+ y npm (viene con Node).
 
 ## Uso
 
 ```bash
-pnpm install
+npm install
 cp .env.example .env   # opcional, solo si querés la API oficial de Google
-pnpm dev               # http://localhost:3000
+npm run dev            # http://localhost:3000
 ```
 
 | Script | Qué hace |
 |---|---|
-| `pnpm dev` | Servidor de desarrollo |
-| `pnpm build` | Build de producción |
-| `pnpm preview` | Previsualizar el build |
-| `pnpm lint` | ESLint |
-| `pnpm typecheck` | Chequeo de tipos |
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run preview` | Previsualizar el build |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | Chequeo de tipos |
+| `npm run check:deploy` | Validación pre-deploy (igual que CI/Netlify) |
 
 ## Variables de entorno (opcionales)
 

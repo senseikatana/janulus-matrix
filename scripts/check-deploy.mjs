@@ -26,15 +26,16 @@ const run = (cmd, args = []) => {
   else fail(`node ${process.versions.node} < 22`, 'Netlify usa NODE_VERSION=22; alineá tu local.')
 }
 
-// 2. pnpm según packageManager.
+// 2. Gestor npm + scripts (migración pnpm -> npm).
 {
   const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
-  const expected = pkg.packageManager ?? ''
-  const actual = run('pnpm', ['--version'])
-  if (expected && actual && expected === `pnpm@${actual}`) ok(`pnpm ${actual} coincide con packageManager`)
-  else fail('versión de pnpm', `packageManager=${expected || '?'}, instalado=${actual || '?'}`)
-  if (pkg.scripts?.['build:core']) fail('script build:core obsoleto', 'quitar de package.json (ya no hay workspace)')
-  else ok('sin script build:core')
+  const actual = run('npm', ['--version'])
+  if (actual) ok(`npm ${actual} disponible`)
+  else fail('npm no disponible', 'instalar Node 22+ con npm')
+  if (pkg.packageManager?.startsWith('pnpm')) fail('packageManager aún apunta a pnpm', 'quitar el campo o usar npm')
+  else ok('sin packageManager pnpm')
+  if (!existsSync(join(ROOT, 'package-lock.json'))) fail('falta package-lock.json', 'correr npm install y commitearlo')
+  else ok('package-lock.json presente')
   if (!pkg.scripts?.build) fail('falta script build', 'package.json necesita "build": "nuxt build"')
   else ok('script build presente')
 }
@@ -45,22 +46,20 @@ const run = (cmd, args = []) => {
   const missing = required.filter(f => !existsSync(join(ROOT, f)))
   if (missing.length === 0) ok('archivos requeridos presentes')
   else fail('archivos faltantes', missing.join(', '))
-  // pnpm-workspace.yaml solo-settings (allowBuilds) está permitido: pnpm 12 lo exige.
-  // Lo prohibido es un workspace real (campo packages o dir packages/).
-  const wsFile = join(ROOT, 'pnpm-workspace.yaml')
-  const wsContent = existsSync(wsFile) ? readFileSync(wsFile, 'utf8') : ''
+  // Con npm no hay workspace: prohibidos dir packages y restos pnpm.
   const problems = []
   if (existsSync(join(ROOT, 'packages'))) problems.push('packages/')
-  if (/^\s*packages\s*:/m.test(wsContent) || /janulus-core/.test(wsContent)) problems.push('pnpm-workspace.yaml con workspace real')
-  if (problems.length === 0) ok('sin workspace real (single-package)')
-  else fail('restos del workspace', problems.join(', '))
+  if (existsSync(join(ROOT, 'pnpm-workspace.yaml'))) problems.push('pnpm-workspace.yaml')
+  if (existsSync(join(ROOT, 'pnpm-lock.yaml'))) problems.push('pnpm-lock.yaml')
+  if (problems.length === 0) ok('sin restos pnpm/workspace (npm single-package)')
+  else fail('restos pnpm/workspace', problems.join(', '))
 }
 
 // 4. Anti-leaks: lo mismo que el scanner de Netlify (valores, no nombres).
 {
   const SKIP_DIRS = new Set(['node_modules', '.git', '.nuxt', '.output', '.netlify', 'dist'])
   // Generados: los hashes de integridad parecen tokens (falso positivo documentado).
-  const SKIP_FILES = new Set(['pnpm-lock.yaml'])
+  const SKIP_FILES = new Set(['package-lock.json'])
   const TEXT_EXT = new Set(['.md', '.ts', '.vue', '.json', '.toml', '.yml', '.yaml', '.example', '.mjs'])
   const hits = []
   const walk = (dir) => {
@@ -87,12 +86,12 @@ const run = (cmd, args = []) => {
 // 5. Build + artefactos (igual que Netlify).
 if (!SKIP_BUILD) {
   try {
-    execFileSync('pnpm', ['install', '--frozen-lockfile'], { cwd: ROOT, stdio: 'pipe' })
-    execFileSync('pnpm', ['build'], { cwd: ROOT, stdio: 'pipe' })
-    ok('pnpm install + build')
+    execFileSync('npm', ['ci'], { cwd: ROOT, stdio: 'pipe' })
+    execFileSync('npm', ['run', 'build'], { cwd: ROOT, stdio: 'pipe' })
+    ok('npm ci + build')
   } catch (e) {
     const errTail = String(e.stderr || e.stdout || e.message).trim().split('\n').slice(-4).join(' | ')
-    fail('pnpm install + build', errTail.slice(0, 300))
+    fail('npm ci + build', errTail.slice(0, 300))
   }
   const pubAssets = existsSync(join(ROOT, '.output/public/_nuxt'))
   const nitroServer = existsSync(join(ROOT, '.output/server/index.mjs'))
