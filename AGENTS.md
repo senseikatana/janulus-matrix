@@ -70,3 +70,6 @@ Todo el deploy se maneja con wrangler. Skill de referencia: `wrangler`
   (portable Netlify/Workers; Hyperdrive solo si hace falta SQL crudo).
 - Proyecto InsForge aún NO linkeado localmente (no existe `.insforge/`).
 - Pre-deploy local: `npm run check:deploy` (`scripts/check-deploy.mjs`).
+- CI (`.github/workflows/ci.yml`) pinea npm 11: npm 10 rechaza `npm ci`
+  por los optional peers de `@bomb.sh/tab` (cac/commander); npm 11 lo acepta.
+  No sacar el pin sin re-verificar `npm@10 ci` en local.

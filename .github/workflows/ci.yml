@@ -21,6 +21,12 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
 
+      - name: Pin npm 11
+        # npm 10 (bundled con Node 22) rechaza `npm ci`: exige los optional
+        # peers de @bomb.sh/tab (cac/commander) como nodos del lock.
+        # Verificado: npm@10 ci falla, npm@11 ci pasa con el mismo árbol.
+        run: npm install -g npm@11
+
       - name: Install dependencies
         run: npm ci
 
