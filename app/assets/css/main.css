@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme static {
+  --font-sans: 'Public Sans', sans-serif;
+
+  --color-green-50: #EFFDF5;
+  --color-green-100: #D9FBE8;
+  --color-green-200: #B3F5D1;
+  --color-green-300: #75EDAE;
+  --color-green-400: #00DC82;
+  --color-green-500: #00C16A;
+  --color-green-600: #00A155;
+  --color-green-700: #007F45;
+  --color-green-800: #016538;
+  --color-green-900: #0A5331;
+  --color-green-950: #052E16;
+}
+
+/* Flashcard flip 3D (bidireccional, ambos idiomas en la misma card) */
+.flip-card {
+  perspective: 1200px;
+  min-height: 150px;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  min-height: 150px;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--ui-radius, 0.75rem);
+  padding: 1rem;
+  min-height: 150px;
+  border: 1px solid var(--ui-border, rgb(0 0 0 / 0.08));
+}
+
+.flip-front {
+  background: var(--ui-bg-elevated, rgb(0 0 0 / 0.02));
+}
+
+.flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  background: var(--ui-primary, #00a155);
+  color: white;
+}
