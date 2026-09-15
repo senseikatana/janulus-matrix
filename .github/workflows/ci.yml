@@ -32,3 +32,9 @@ jobs:
 
       - name: Typecheck
         run: pnpm run typecheck
+
+      - name: Build janulus-core
+        run: pnpm --filter janulus-core build
+
+      - name: Check package
+        run: npx --yes publint --pack packages/janulus-core
