@@ -1,4 +1,4 @@
-import type { LOCALE, PhraseEntry, TranslationProvider } from '~~/shared/janulus'
+import type { LOCALE, PhraseEntry } from '~~/shared/janulus'
 import { detectKind, newId, needsReviewFor, transcribe } from '~~/shared/janulus'
 import { translateText } from './useTranslate'
 
@@ -72,7 +72,7 @@ function backfill(entry: PhraseEntry): boolean {
 function applyTranslations(
   entry: PhraseEntry,
   translations: Partial<Record<LOCALE, string>>,
-  provider: TranslationProvider
+  provider: PhraseEntry['provider']
 ): void {
   for (const loc of ALL_LOCALES) {
     const v = translations[loc]
@@ -85,12 +85,78 @@ function applyTranslations(
   }
   entry.provider = provider
   entry.failed = provider === 'echo'
-  entry.needsReview = needsReviewFor(provider)
+  entry.needsReview = provider ? needsReviewFor(provider) : false
+}
+
+// --- Persistencia en InsForge (best-effort: si falla, sigue localStorage) ---
+
+interface PhrasesResponse {
+  phrases: PhraseEntry[]
+}
+
+async function apiList(): Promise<PhraseEntry[] | null> {
+  try {
+    const res = await $fetch<PhrasesResponse>('/api/phrases')
+    return res.phrases
+  } catch {
+    return null
+  }
+}
+
+async function apiCreate(entry: PhraseEntry, source: LOCALE, text: string): Promise<void> {
+  try {
+    await $fetch('/api/phrases', {
+      method: 'POST',
+      body: { id: entry.id, kind: entry.kind, source, text }
+    })
+  } catch {
+    // sin server: la entrada queda igual en localStorage
+  }
+}
+
+function entryPatch(entry: PhraseEntry): Record<string, unknown> {
+  const texts: Record<string, string> = {}
+  const ipa: Record<string, string | null> = {}
+  const ipaVerified: Record<string, boolean> = {}
+  for (const loc of ALL_LOCALES) {
+    const value = entry.text[loc]
+    if (value) {
+      texts[loc] = value
+      ipa[loc] = entry.ipa[loc] ?? null
+      ipaVerified[loc] = entry.ipaVerified[loc] ?? false
+    }
+  }
+  return {
+    texts,
+    ipa,
+    ipaVerified,
+    failed: entry.failed,
+    needsReview: entry.needsReview,
+    provider: entry.provider ?? null
+  }
+}
+
+async function apiPatch(entry: PhraseEntry, payload: Record<string, unknown>): Promise<void> {
+  try {
+    await $fetch(`/api/phrases/${entry.id}`, { method: 'PATCH', body: payload })
+  } catch {
+    // best-effort
+  }
+}
+
+async function apiDelete(id: string): Promise<void> {
+  try {
+    await $fetch(`/api/phrases/${id}`, { method: 'DELETE' })
+  } catch {
+    // best-effort
+  }
 }
 
 /**
  * Matriz ToDo de frases. La pestaña activa es el idioma origen.
  * Alta optimista con Enter: la fila aparece ya, la traducción completa después.
+ * Persistencia: InsForge (tablas phrases/phrase_texts) con localStorage como
+ * caché offline; si el server está vacío, sube lo local una única vez.
  */
 export function useMatrix() {
   const activeTab = useState<LOCALE>('janulus-active-tab', () => 'pt')
@@ -99,7 +165,18 @@ export function useMatrix() {
   const globalPending = ref(false)
   const lastError = ref<string | null>(null)
 
-  function load(): void {
+  function persist(): void {
+    writeStorage(entries.value)
+  }
+
+  function guessSource(entry: PhraseEntry): LOCALE {
+    if (entry.text[activeTab.value]) {
+      return activeTab.value
+    }
+    return ALL_LOCALES.find(loc => entry.text[loc]) ?? 'es'
+  }
+
+  async function load(): Promise<void> {
     if (loaded.value) {
       return
     }
@@ -110,15 +187,32 @@ export function useMatrix() {
         dirty = true
       }
     }
+    // Pintado instantáneo con la caché local.
     entries.value = stored
     loaded.value = true
     if (dirty) {
       persist()
     }
-  }
 
-  function persist(): void {
-    writeStorage(entries.value)
+    const remote = await apiList()
+    if (remote === null) {
+      return
+    }
+    if (remote.length === 0 && stored.length > 0) {
+      // Migración única: sube lo que había solo en localStorage.
+      for (const entry of stored) {
+        const source = guessSource(entry)
+        await apiCreate(entry, source, entry.text[source] ?? '')
+        await apiPatch(entry, entryPatch(entry))
+      }
+      const after = await apiList()
+      if (after) {
+        entries.value = after
+      }
+    } else {
+      entries.value = remote
+    }
+    persist()
   }
 
   async function resolveEntry(entry: PhraseEntry, source: LOCALE): Promise<void> {
@@ -140,6 +234,7 @@ export function useMatrix() {
       entry.pending = false
       entries.value = [...entries.value]
       persist()
+      await apiPatch(entry, entryPatch(entry))
     }
   }
 
@@ -167,6 +262,7 @@ export function useMatrix() {
     // Update optimista: la tabla nunca se vacía ni se reordena.
     entries.value = [entry, ...entries.value]
     persist()
+    await apiCreate(entry, source, input)
 
     globalPending.value = true
     lastError.value = null
@@ -193,15 +289,18 @@ export function useMatrix() {
   function removeEntry(id: string): void {
     entries.value = entries.value.filter(e => e.id !== id)
     persist()
+    void apiDelete(id)
   }
 
   function toggleDone(id: string): void {
-    const found = entries.value.find(e => e.id !== id)
-    if (found) {
-      found.done = !found.done
-      entries.value = [...entries.value]
-      persist()
+    const found = entries.value.find(e => e.id === id)
+    if (!found) {
+      return
     }
+    found.done = !found.done
+    entries.value = [...entries.value]
+    persist()
+    void apiPatch(found, { done: found.done })
   }
 
   const visibleEntries = computed(() => entries.value)

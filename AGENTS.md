@@ -86,7 +86,13 @@ Todo el deploy se maneja con wrangler. Skill de referencia: `wrangler`
   (`public.set_updated_at`). NO actualizar a `prisma@8` (RC con otra CLI).
 - Tablas: `phrases`, `phrase_texts`, `translation_cache`, `media`; RLS sin
   policies (anon/authenticated bloqueados; `project_admin` BYPASSRLS y Prisma pasan).
+- CRUD de frases: `server/api/phrases/*` (GET/POST/PATCH/DELETE sobre InsForge
+  SDK admin); `useMatrix` persiste ahí con localStorage como caché offline y
+  migración única si el server está vacío.
 - Bucket público `janulus-media` para assets; persistir `url` + `key` en `media`.
+- Dominio propio: `janulus-matrix.senseikatana.com` funciona (custom domain).
+  GOTCHA: la zona tiene Managed Challenge — `curl` recibe 403 "Just a moment",
+  los navegadores pasan. Para verificar API en prod usar el `*.workers.dev`.
 - Proyecto InsForge linkeado (`.insforge/project.json`, gitignoreado).
 - Pre-deploy local: `npm run check:deploy` (`scripts/check-deploy.mjs`).
 - CI (`.github/workflows/ci.yml`) pinea npm 11: npm 10 rechaza `npm ci`
