@@ -5,7 +5,7 @@
 .nitro
 .cache
 dist
-
+.atl/
 # Node dependencies
 node_modules
 
