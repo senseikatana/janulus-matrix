@@ -1,13 +1,16 @@
 {
   "name": "janulus-matrix",
   "version": "0.1.0",
-  "description": "Proyecto janulus-matrix",
+  "description": "Matriz Powell Janulus para intercambio mutuo Portugués (BR) ↔ Español",
   "type": "module",
   "scripts": {
-    "dev": "bun run dev",
-    "build": "bun run build",
-    "test": "bun run test"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "author": "senseikatana - Sergio Jurado",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^6.2.0"
+  }
 }
