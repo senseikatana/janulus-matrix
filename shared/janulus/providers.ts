@@ -7,6 +7,10 @@ export interface ChainOptions {
   targets: LOCALE[]
   /** Opt-in: solo si hay key, la oficial va primera. Sin key, cadena 100% gratis. */
   googleApiKey?: string
+  /** Opt-in: email válido para cuota MyMemory x10 (5k -> 50k chars/día). */
+  myMemoryEmail?: string
+  /** Opt-in: IP del usuario final para que MyMemory atribuya cuota por usuario. */
+  clientIp?: string
   timeoutMs?: number
   fetchFn?: typeof fetch
 }
