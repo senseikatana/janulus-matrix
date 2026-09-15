@@ -39,7 +39,11 @@ jobs:
         run: pnpm run typecheck
 
       - name: Build and check package
-        run: pnpm --filter janulus-core build && npx --yes publint --pack packages/janulus-core
+        run: |
+          pnpm --filter janulus-core build
+          pnpm --dir packages/janulus-core pack
+          pnpm dlx publint ./packages/janulus-core/janulus-core-*.tgz
+          rm ./packages/janulus-core/janulus-core-*.tgz
 
       - name: Bump version
         run: pnpm --filter janulus-core version ${{ inputs.version }}

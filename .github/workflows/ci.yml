@@ -37,4 +37,7 @@ jobs:
         run: pnpm run typecheck
 
       - name: Check package
-        run: pnpm --filter janulus-core dlx publint
+        run: |
+          pnpm --dir packages/janulus-core pack
+          pnpm dlx publint ./packages/janulus-core/janulus-core-*.tgz
+          rm ./packages/janulus-core/janulus-core-*.tgz
