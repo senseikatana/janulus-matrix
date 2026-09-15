@@ -1,0 +1,13 @@
+# Janulus Matrix — deploy en Netlify (Nuxt 4 SSR + pnpm monorepo)
+# Nitro autodetecta el preset `netlify` cuando existe NETLIFY=true en el build.
+[build]
+  command = "pnpm install --frozen-lockfile && pnpm build:core && pnpm build"
+  publish = ".output/public"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Netlify respeta `packageManager: pnpm@12.4.1` vía corepack.
+  # Si el build falla con pnpm, setear en UI: NETLIFY_USE_PNPM="true".
+
+# SSR + server routes (/api/translate) van por functions automáticamente.
+# Sin redirects custom: routeRules de Nuxt ya manejan `/`.
