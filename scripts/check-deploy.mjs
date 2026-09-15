@@ -57,7 +57,7 @@ const run = (cmd, args = []) => {
 
 // 4. Anti-leaks: lo mismo que el scanner de Netlify (valores, no nombres).
 {
-  const SKIP_DIRS = new Set(['node_modules', '.git', '.nuxt', '.output', '.netlify', 'dist'])
+  const SKIP_DIRS = new Set(['node_modules', '.git', '.nuxt', '.output', '.netlify', 'dist', '.insforge', 'prisma/generated'])
   // Generados: los hashes de integridad parecen tokens (falso positivo documentado).
   const SKIP_FILES = new Set(['package-lock.json'])
   const TEXT_EXT = new Set(['.md', '.ts', '.vue', '.json', '.toml', '.yml', '.yaml', '.example', '.mjs'])
@@ -66,7 +66,7 @@ const run = (cmd, args = []) => {
     for (const entry of readdirSync(dir)) {
       const full = join(dir, entry)
       const rel = relative(ROOT, full)
-      if (SKIP_DIRS.has(entry) || SKIP_FILES.has(entry)) continue
+      if (SKIP_DIRS.has(entry) || SKIP_DIRS.has(rel) || SKIP_FILES.has(entry)) continue
       if (statSync(full).isDirectory()) {
         walk(full)
       } else if ([...TEXT_EXT].some(ext => entry.endsWith(ext))) {

@@ -1,3 +1,7 @@
-# Copiar a `.dev.vars` y completar con el connection string real del Postgres.
+# Copiar a `.dev.vars` y completar con valores reales.
 # `.dev.vars` está gitignoreado: nunca commitear valores.
 CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE=postgresql://USER:PASSWORD@HOST:5432/DB?sslmode=require
+NUXT_PUBLIC_INSFORGE_URL=
+NUXT_INSFORGE_API_KEY=
+NUXT_MYMEMORY_EMAIL=
+NUXT_OPENROUTER_API_KEY=

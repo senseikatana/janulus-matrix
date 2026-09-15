@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "janulus-matrix",
+  "workers_dev": true,
   "compatibility_date": "2026-08-15",
   "compatibility_flags": [
     "nodejs_compat"
@@ -13,6 +14,14 @@
     "binding": "ASSETS",
     "directory": "./.output/public/"
   },
+  // Dominio propio declarativo: sobrevive borrados/redeploys del Worker.
+  // El DNS y el certificado los gestiona Cloudflare con `custom_domain`.
+  "routes": [
+    {
+      "pattern": "janulus-matrix.senseikatana.com",
+      "custom_domain": true
+    }
+  ],
   // Hyperdrive "janulus-matrix-db" -> Postgres de InsForge (us-east).
   // `wrangler dev` local exige string de conexión: va en `.dev.vars`
   // (CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE), nunca acá.

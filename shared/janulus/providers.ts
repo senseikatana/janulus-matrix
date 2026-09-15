@@ -209,7 +209,7 @@ async function viaOpenRouter(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${key}`
+        'Authorization': `Bearer ${key}`
       },
       body: JSON.stringify({
         model: OPENROUTER_MODEL,
