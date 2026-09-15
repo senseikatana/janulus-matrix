@@ -1,76 +1,119 @@
+<script setup lang="ts">
+import type { LOCALE } from 'janulus-core'
+import { LOCALE_LABELS } from 'janulus-core'
+
+useHead({ htmlAttrs: { lang: 'pt-BR' } })
+useSeoMeta({
+  title: 'Janulus Matrix — PT ↔ ES',
+  description: 'Matriz ToDo de frases y vocabulario PT-ES-EN-CA-GL con traducción automática gratis, IPA y flashcards con flip.'
+})
+
+const { activeTab, entries, globalPending, lastError, load, addEntry, retryEntry, removeEntry, toggleDone } = useMatrix()
+const { frontLang, backLang, flipped, toggleFlip, swapDirection, setDirection } = useDeck('pt', 'es')
+
+const tabs: { value: LOCALE, label: string }[] = [
+  { value: 'pt', label: 'Português' },
+  { value: 'es', label: 'Español' },
+  { value: 'en', label: 'English' },
+  { value: 'ca', label: 'Català' },
+  { value: 'gl', label: 'Galego' }
+]
+
+onMounted(() => {
+  load()
+})
+
+watch(activeTab, (tab) => {
+  setDirection(tab, tab === 'es' ? 'pt' : 'es')
+})
+
+async function onSubmit(value: string): Promise<void> {
+  await addEntry(value)
+}
+</script>
+
 <template>
-  <div>
-    <UPageHero
-      title="Nuxt Starter Template"
-      description="A production-ready starter template powered by Nuxt UI. Build beautiful, accessible, and performant applications in minutes, not hours."
-      :links="[{
-        label: 'Get started',
-        to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-        target: '_blank',
-        trailingIcon: 'i-lucide-arrow-right',
-        size: 'xl'
-      }, {
-        label: 'Use this template',
-        to: 'https://github.com/nuxt-ui-templates/starter',
-        target: '_blank',
-        icon: 'i-simple-icons-github',
-        size: 'xl',
-        color: 'neutral',
-        variant: 'subtle'
-      }]"
-    />
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 flex flex-col gap-6 py-6">
+    <div>
+      <h1 class="text-2xl font-bold">
+        Janulus Matrix
+      </h1>
+      <p class="text-muted mt-1">
+        Escribí una palabra (<em>hoje, agora, eu</em>) o una frase larga en la pestaña activa y pulsá
+        <kbd class="px-1 rounded bg-elevated border">Enter</kbd>. Se traduce sola sin romper la tabla,
+        con IPA y su flashcard con flip.
+      </p>
+    </div>
 
-    <UPageSection
-      id="features"
-      title="Everything you need to build modern Nuxt apps"
-      description="Start with a solid foundation. This template includes all the essentials for building production-ready applications with Nuxt UI's powerful component system."
-      :features="[{
-        icon: 'i-lucide-rocket',
-        title: 'Production-ready from day one',
-        description: 'Pre-configured with TypeScript, ESLint, Tailwind CSS, and all the best practices. Focus on building features, not setting up tooling.'
-      }, {
-        icon: 'i-lucide-palette',
-        title: 'Beautiful by default',
-        description: 'Leveraging Nuxt UI\'s design system with automatic dark mode, consistent spacing, and polished components that look great out of the box.'
-      }, {
-        icon: 'i-lucide-zap',
-        title: 'Lightning fast',
-        description: 'Optimized for performance with SSR/SSG support, automatic code splitting, and edge-ready deployment. Your users will love the speed.'
-      }, {
-        icon: 'i-lucide-blocks',
-        title: '100+ components included',
-        description: 'Access Nuxt UI\'s comprehensive component library. From forms to navigation, everything is accessible, responsive, and customizable.'
-      }, {
-        icon: 'i-lucide-code-2',
-        title: 'Developer experience first',
-        description: 'Auto-imports, hot module replacement, and TypeScript support. Write less boilerplate and ship more features.'
-      }, {
-        icon: 'i-lucide-shield-check',
-        title: 'Built for scale',
-        description: 'Enterprise-ready architecture with proper error handling, SEO optimization, and security best practices built-in.'
-      }]"
-    />
-
-    <UPageSection>
-      <UPageCTA
-        title="Ready to build your next Nuxt app?"
-        description="Join thousands of developers building with Nuxt and Nuxt UI. Get this template and start shipping today."
-        variant="subtle"
-        :links="[{
-          label: 'Start building',
-          to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-          target: '_blank',
-          trailingIcon: 'i-lucide-arrow-right',
-          color: 'neutral'
-        }, {
-          label: 'View on GitHub',
-          to: 'https://github.com/nuxt-ui-templates/starter',
-          target: '_blank',
-          icon: 'i-simple-icons-github',
-          color: 'neutral',
-          variant: 'outline'
-        }]"
+    <!-- Hojas: PT primera, ES segunda -->
+    <div
+      role="tablist"
+      aria-label="Hojas de idioma"
+      class="flex flex-wrap gap-2"
+    >
+      <UButton
+        v-for="tab in tabs"
+        :key="tab.value"
+        :label="tab.label"
+        :variant="activeTab === tab.value ? 'solid' : 'subtle'"
+        size="sm"
+        role="tab"
+        :aria-selected="activeTab === tab.value"
+        @click="activeTab = tab.value"
       />
-    </UPageSection>
+    </div>
+
+    <ClientOnly>
+      <MatrixInput
+        :source-label="LOCALE_LABELS[activeTab]"
+        :loading="globalPending"
+        @submit="onSubmit"
+      />
+      <p
+        v-if="lastError"
+        class="text-sm text-warning"
+      >
+        {{ lastError }}
+      </p>
+
+      <UTabs
+        :items="[{ label: 'Matriz', value: 'matrix' }, { label: `Flashcards (${entries.length})`, value: 'deck' }]"
+        default-value="matrix"
+      >
+        <template #content="{ item }">
+          <div
+            v-if="item.value === 'matrix'"
+            class="mt-4"
+          >
+            <MatrixTable
+              :entries="entries"
+              :source="activeTab"
+              @remove="removeEntry"
+              @toggle-done="toggleDone"
+              @retry="retryEntry"
+            />
+          </div>
+          <div
+            v-else
+            class="mt-4"
+          >
+            <FlashcardDeck
+              :entries="entries"
+              :front-lang="frontLang"
+              :back-lang="backLang"
+              :flipped-ids="flipped"
+              @flip="toggleFlip"
+              @swap="swapDirection"
+            />
+          </div>
+        </template>
+      </UTabs>
+
+      <template #fallback>
+        <p class="text-sm text-muted">
+          Cargando tu matriz…
+        </p>
+      </template>
+    </ClientOnly>
   </div>
 </template>
