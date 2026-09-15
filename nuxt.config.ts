@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', '@nuxt/ui', "nitro-cloudflare-dev"],
+  modules: ['@nuxt/eslint', '@nuxt/ui', 'nitro-cloudflare-dev'],
 
   devtools: {
     enabled: process.env.NODE_ENV !== 'production'
@@ -24,15 +24,6 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2026-06-30',
 
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
-  },
-
   nitro: {
     // En Netlify (NETLIFY=true) Nitro debe usar el preset `netlify` (publica en dist/
     // + functions en .netlify/). Un preset hardcodeado a cloudflare rompería el deploy.
@@ -41,6 +32,15 @@ export default defineNuxtConfig({
     cloudflare: {
       deployConfig: true,
       nodeCompat: true
+    }
+  },
+
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: 'never',
+        braceStyle: '1tbs'
+      }
     }
   }
 })
