@@ -1,5 +1,5 @@
-import type { LOCALE, TranslateRequest, TranslateResponse } from 'janulus-core'
-import { translateWithChain } from 'janulus-core'
+import type { LOCALE, TranslateRequest, TranslateResponse } from '~~/shared/janulus'
+import { translateWithChain } from '~~/shared/janulus'
 
 const SUPPORTED: readonly LOCALE[] = ['es', 'pt', 'en', 'ca', 'gl']
 
@@ -8,7 +8,7 @@ function isLocale(value: unknown): value is LOCALE {
 }
 
 /**
- * Proxy de traducción gratis-primero (ver `janulus-core`).
+ * Proxy de traducción gratis-primero (ver `shared/janulus`).
  * Sin `NUXT_TRANSLATE_API_KEY`: cadena 100% gratuita sin cuentas.
  * Con key (opt-in): la API oficial de Google va primera.
  * La key nunca sale del server.

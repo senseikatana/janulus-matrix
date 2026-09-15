@@ -1,4 +1,4 @@
-import type { LOCALE } from 'janulus-core'
+import type { LOCALE } from '~~/shared/janulus'
 
 /**
  * Mazo ANKI simplificado: cada entrada ES una card con ambos idiomas.

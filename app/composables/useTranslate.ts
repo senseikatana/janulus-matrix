@@ -1,4 +1,4 @@
-import type { LOCALE, TranslateResponse } from 'janulus-core'
+import type { LOCALE, TranslateResponse } from '~~/shared/janulus'
 
 let aborter: AbortController | null = null
 

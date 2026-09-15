@@ -1,5 +1,5 @@
-import type { LOCALE, PhraseEntry, TranslationProvider } from 'janulus-core'
-import { detectKind, newId, needsReviewFor, transcribe } from 'janulus-core'
+import type { LOCALE, PhraseEntry, TranslationProvider } from '~~/shared/janulus'
+import { detectKind, newId, needsReviewFor, transcribe } from '~~/shared/janulus'
 import { translateText } from './useTranslate'
 
 const STORAGE_KEY = 'janulus-matrix:v1'

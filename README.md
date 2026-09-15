@@ -6,16 +6,10 @@ Matriz ToDo de frases y vocabulario **PT ↔ ES ↔ EN ↔ CA ↔ GL** con tradu
 
 - **Hojas por idioma:** PT primera, ES segunda (+ EN/CA/GL). La pestaña activa es el idioma origen.
 - **Input estilo ToDo:** escribís palabra (`vocab`) o frase y pulsás **Enter** → alta optimista, la tabla nunca se rompe.
-- **Traducción gratis-primero:** `janulus-core` — diccionario offline → Google gtx → MyMemory → palabra-por-palabra, con guardián `isPlausibleTranslation()` y reintento por fila. **$0, sin keys, sin cuentas.**
+- **Traducción gratis-primero:** `shared/janulus` — diccionario offline → Google gtx → MyMemory → palabra-por-palabra, con guardián `isPlausibleTranslation()` y reintento por fila. **$0, sin keys, sin cuentas.**
 - **IPA:** verificada de diccionario (`dic`) o aproximada por reglas pt/es (`aprox`).
 - **Flashcards:** cada entrada es una card con ambos idiomas, flip CSS y dirección invertible.
 - **Persistencia local:** `localStorage` SSR-safe (`janulus-matrix:v1`).
-
-## Paquetes
-
-| Paquete | NPM | Descripción |
-|---|---|---|
-| `packages/janulus-core` | `janulus-core` | Core agnóstico: tipos, diccionario, fonética, cadena de traducción. Cero dependencias. |
 
 ## Requisitos
 
@@ -25,7 +19,6 @@ Node 20+ y `pnpm@12.4.1`.
 
 ```bash
 pnpm install
-pnpm build:core            # genera los .d.ts de janulus-core (requerido para typecheck)
 cp .env.example .env   # opcional, solo si querés la API oficial de Google
 pnpm dev               # http://localhost:3000
 ```
@@ -51,13 +44,6 @@ curl -X POST http://localhost:3000/api/translate \
   -H 'Content-Type: application/json' \
   -d '{"text":"hoy","source":"es","targets":["pt","en"]}'
 # {"translations":{"es":"hoy","pt":"hoje","en":"today"},"fromDictionary":true,"provider":"dictionary"}
-```
-
-## Publicar `janulus-core` en NPM
-
-```bash
-pnpm --filter janulus-core build
-pnpm --filter janulus-core publish --access public --provenance
 ```
 
 ## Licencia

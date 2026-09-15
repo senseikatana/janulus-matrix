@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { LOCALE } from 'janulus-core'
-import { LOCALE_LABELS } from 'janulus-core'
+import type { LOCALE } from '~~/shared/janulus'
+import { LOCALE_LABELS } from '~~/shared/janulus'
 
 useHead({ htmlAttrs: { lang: 'pt-BR' } })
 useSeoMeta({

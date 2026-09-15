@@ -1,6 +1,5 @@
-packages:
-  - 'packages/*'
-
+# Solo aprobación de build scripts (sin campo `packages`: paquete único, no workspace).
+# pnpm 12 exige este registro explícito o el install falla en modo no interactivo.
 allowBuilds:
   '@parcel/watcher': false
   '@tailwindcss/oxide': false

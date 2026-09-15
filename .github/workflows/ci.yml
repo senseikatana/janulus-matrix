@@ -27,17 +27,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build janulus-core
-        run: pnpm --filter janulus-core build
-
       - name: Lint
         run: pnpm run lint
 
       - name: Typecheck
         run: pnpm run typecheck
 
-      - name: Check package
-        run: |
-          pnpm --dir packages/janulus-core pack
-          pnpm dlx publint ./packages/janulus-core/janulus-core-*.tgz
-          rm ./packages/janulus-core/janulus-core-*.tgz
+      - name: Check deploy
+        run: pnpm run check:deploy

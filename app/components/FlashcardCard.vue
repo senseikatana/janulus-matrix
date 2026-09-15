@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { LOCALE, PhraseEntry } from 'janulus-core'
-import { LOCALE_LABELS } from 'janulus-core'
+import type { LOCALE, PhraseEntry } from '~~/shared/janulus'
+import { LOCALE_LABELS } from '~~/shared/janulus'
 
 const props = defineProps<{
   entry: PhraseEntry

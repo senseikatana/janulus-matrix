@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "build:core": "pnpm --filter janulus-core build",
+    "check:deploy": "node scripts/check-deploy.mjs",
     "dev": "nuxt dev",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -15,7 +15,6 @@
     "@iconify-json/lucide": "^1.2.132",
     "@iconify-json/simple-icons": "^1.2.96",
     "@nuxt/ui": "^4.11.1",
-    "janulus-core": "workspace:*",
     "nuxt": "^4.5.2",
     "tailwindcss": "^4.3.3"
   },
