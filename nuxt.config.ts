@@ -12,16 +12,13 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
-    // Opt-in: solo con key, la oficial de Google va primera. Sin key, cadena 100% gratis.
-    // Se configura con NUXT_TRANSLATE_API_KEY en .env (nunca NUXT_PUBLIC_*).
-    translateApiKey: '',
     public: {
       translateProvider: 'gtx'
     }
   },
 
   routeRules: {
-    '/': { ssr: true }
+    '/': { ssr: true, prerender: true }
   },
 
   compatibilityDate: '2026-06-30',

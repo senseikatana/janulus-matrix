@@ -1,7 +1,7 @@
 {
   "name": "janulus-matrix",
-  "private": true,
   "type": "module",
+  "version": "0.1.2"
   "scripts": {
     "build": "nuxt build",
     "check:deploy": "node scripts/check-deploy.mjs",
@@ -22,7 +22,7 @@
     "@nuxt/eslint": "^1.17.0",
     "eslint": "^10.10.0",
     "typescript": "^6.0.3",
-    "vue-tsc": "^3.3.11"
-  },
-  "packageManager": "pnpm@12.4.1"
+    "vue-tsc": "^3.3.11",
+    "wrangler": "^4.131.2"
+  }
 }
