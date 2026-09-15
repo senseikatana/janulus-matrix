@@ -20,14 +20,21 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.132",
     "@iconify-json/simple-icons": "^1.2.96",
+    "@insforge/sdk": "^1.5.2",
     "@nuxt/ui": "^4.11.1",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
     "nuxt": "^4.5.2",
+    "pg": "^8.23.0",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.17.0",
+    "@types/pg": "^8.23.1",
+    "dotenv": "^17.4.2",
     "eslint": "^10.10.0",
     "nitro-cloudflare-dev": "^0.2.2",
+    "prisma": "^7.10.0",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.3.11",
     "wrangler": "^4.131.2"

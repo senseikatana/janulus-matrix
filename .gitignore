@@ -6,6 +6,8 @@
 .cache
 dist
 .atl/
+# Prisma generated client (runtime usa @insforge/sdk; Prisma es solo DDL)
+prisma/generated
 # Node dependencies
 node_modules
 

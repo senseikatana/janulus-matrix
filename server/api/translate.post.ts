@@ -29,13 +29,8 @@ export default defineEventHandler(async (event): Promise<TranslateResponse> => {
     throw createError({ statusCode: 400, message: 'targets inválido' })
   }
 
-  const config = useRuntimeConfig(event)
-  const googleApiKey = typeof config.translateApiKey === 'string' && config.translateApiKey
-    ? config.translateApiKey
-    : undefined
-  const myMemoryEmail = typeof config.myMemoryEmail === 'string' && config.myMemoryEmail
-    ? config.myMemoryEmail
-    : undefined
+  const googleApiKey = getServerEnv(event, 'NUXT_TRANSLATE_API_KEY')
+  const myMemoryEmail = getServerEnv(event, 'NUXT_MYMEMORY_EMAIL')
   const clientIp = getRequestIP(event, { xForwardedFor: true })
 
   return await translateWithChain({ text, source, targets, googleApiKey, myMemoryEmail, clientIp: clientIp ?? undefined })

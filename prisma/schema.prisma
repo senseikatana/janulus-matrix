@@ -1,0 +1,73 @@
+// Janulus Matrix — schema Prisma (Postgres de InsForge).
+// Prisma es dueño del DDL (migrate); el runtime usa @insforge/sdk y Hyperdrive
+// queda disponible para SQL crudo. RLS/triggers/ownership van en la migración.
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Phrase {
+  id           String   @id
+  kind         String   @default("phrase")
+  sourceLocale String   @map("source_locale")
+  done         Boolean  @default(false)
+  failed       Boolean  @default(false)
+  needsReview  Boolean  @default(false) @map("needs_review")
+  provider     String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  texts PhraseText[]
+  media Media[]
+
+  @@map("phrases")
+}
+
+model PhraseText {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phraseId    String  @map("phrase_id")
+  locale      String
+  text        String
+  ipa         String?
+  ipaVerified Boolean @default(false) @map("ipa_verified")
+
+  phrase Phrase @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+
+  @@unique([phraseId, locale])
+  @@map("phrase_texts")
+}
+
+model TranslationCache {
+  cacheKey   String    @id @map("cache_key")
+  source     String
+  target     String
+  inputText  String    @map("input_text")
+  outputText String    @map("output_text")
+  provider   String
+  hits       Int       @default(0)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastHitAt  DateTime? @map("last_hit_at")
+  expiresAt  DateTime? @map("expires_at")
+
+  @@index([source, target])
+  @@map("translation_cache")
+}
+
+model Media {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bucket    String
+  key       String
+  url       String
+  mime      String?
+  sizeBytes BigInt?  @map("size_bytes")
+  phraseId  String?  @map("phrase_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  phrase Phrase? @relation(fields: [phraseId], references: [id], onDelete: SetNull)
+
+  @@map("media")
+}
