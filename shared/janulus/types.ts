@@ -17,6 +17,8 @@ export type TranslationProvider
     | 'google-official'
     | 'gtx'
     | 'mymemory'
+    | 'openrouter'
+    | 'cache'
     | 'local'
     | 'echo'
 

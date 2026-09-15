@@ -1,4 +1,5 @@
 import type { LOCALE, TranslationProvider } from './types'
+import { LOCALE_LABELS } from './types'
 import { DICTIONARY, lookupDictionary, normalizeKey } from './dictionary'
 
 export interface ChainOptions {
@@ -9,6 +10,9 @@ export interface ChainOptions {
   googleApiKey?: string
   /** Opt-in: email válido para cuota MyMemory x10 (5k -> 50k chars/día). */
   myMemoryEmail?: string
+  /** Opt-in: key de OpenRouter (vía gateway de InsForge). Fallback confiable
+   *  desde IPs de datacenter, donde gtx/MyMemory están bloqueados. */
+  openrouterApiKey?: string
   /** Opt-in: IP del usuario final para que MyMemory atribuya cuota por usuario. */
   clientIp?: string
   timeoutMs?: number
@@ -179,8 +183,66 @@ async function viaMyMemory(
   }
 }
 
+/** Modelo barato y probado en el gateway de InsForge. */
+const OPENROUTER_MODEL = 'openai/gpt-4o-mini'
+
+type OpenRouterResponse = {
+  choices?: Array<{ message?: { content?: string } }>
+}
+
+/**
+ * Traducción vía OpenRouter (gateway de InsForge). Último recurso confiable
+ * desde IPs de datacenter, donde gtx y MyMemory rate-limitean.
+ * Prompt cerrado: solo la traducción, sin comillas ni explicaciones.
+ */
+async function viaOpenRouter(
+  text: string,
+  source: LOCALE,
+  target: LOCALE,
+  key: string,
+  fetchFn: typeof fetch,
+  timeoutMs: number
+): Promise<string | null> {
+  const { signal, done } = withTimeout(timeoutMs)
+  try {
+    const res = await fetchFn('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: OPENROUTER_MODEL,
+        temperature: 0,
+        max_tokens: 512,
+        messages: [
+          {
+            role: 'system',
+            content: `You are a translation engine. Translate the user text from ${LOCALE_LABELS[source]} to ${LOCALE_LABELS[target]}. Reply with only the translation, without quotes or explanations. Preserve tone and punctuation.`
+          },
+          { role: 'user', content: text }
+        ]
+      }),
+      signal
+    })
+    if (!res.ok) {
+      return null
+    }
+    const json = await res.json() as OpenRouterResponse
+    const out = json.choices?.[0]?.message?.content?.trim() ?? null
+    if (!out) {
+      return null
+    }
+    return out.replace(/^["'«“]+|["'»”]+$/g, '').trim() || null
+  } catch {
+    return null
+  } finally {
+    done()
+  }
+}
+
 async function resolveTarget(options: ChainOptions, target: LOCALE): Promise<{ value: string, provider: TranslationProvider }> {
-  const { text, source, googleApiKey, myMemoryEmail, clientIp, timeoutMs = DEFAULT_TIMEOUT, fetchFn = fetch } = options
+  const { text, source, googleApiKey, myMemoryEmail, openrouterApiKey, clientIp, timeoutMs = DEFAULT_TIMEOUT, fetchFn = fetch } = options
   if (target === source) {
     return { value: text, provider: 'local' }
   }
@@ -200,6 +262,12 @@ async function resolveTarget(options: ChainOptions, target: LOCALE): Promise<{ v
   if (mem && isPlausibleTranslation(mem, text, target, source)) {
     return { value: mem, provider: 'mymemory' }
   }
+  if (openrouterApiKey) {
+    const ai = await viaOpenRouter(text, source, target, openrouterApiKey, fetchFn, timeoutMs)
+    if (ai && isPlausibleTranslation(ai, text, target, source)) {
+      return { value: ai, provider: 'openrouter' }
+    }
+  }
   if (local.trim() && local.trim() !== text.trim()) {
     return { value: local, provider: 'local' }
   }
@@ -209,10 +277,12 @@ async function resolveTarget(options: ChainOptions, target: LOCALE): Promise<{ v
 const RANK: Record<TranslationProvider, number> = {
   'google-official': 0,
   'gtx': 1,
-  'mymemory': 2,
+  'openrouter': 2,
+  'mymemory': 3,
   'dictionary': 0,
-  'local': 3,
-  'echo': 4
+  'cache': 0,
+  'local': 4,
+  'echo': 5
 }
 
 /**
@@ -225,6 +295,8 @@ export const TRUSTED_PROVIDERS: readonly TranslationProvider[] = [
   'dictionary',
   'google-official',
   'gtx',
+  'openrouter',
+  'cache',
   'local'
 ]
 
