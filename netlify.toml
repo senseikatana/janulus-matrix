@@ -5,7 +5,8 @@
   publish = ".output/public"
 
 [build.environment]
-  NODE_VERSION = "20"
+  # Nitro 2.13 (preset netlify) usa Set.prototype.difference -> requiere Node 22+.
+  NODE_VERSION = "22"
   # Netlify respeta `packageManager: pnpm@12.4.1` vía corepack.
   # Si el build falla con pnpm, setear en UI: NETLIFY_USE_PNPM="true".
 
