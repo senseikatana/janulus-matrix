@@ -43,7 +43,8 @@ Todo el deploy se maneja con wrangler. Skill de referencia: `wrangler`
 
 - El Worker NO usa SQL crudo hoy; el acceso directo a Postgres va por Hyperdrive.
 - Binding `HYPERDRIVE` en `wrangler.jsonc`, id verificado `754397406bd44797b5ea40772bf6a0bb`
-  (recurso `jalunus-matrix` -> `*.us-east.database.insforge.app:5432`, DB `insforge`).
+  (recurso `janulus-matrix-db` -> Postgres de InsForge en us-east:5432, DB `insforge`;
+  ver host exacto con `wrangler hyperdrive list`, no commitearlo acá).
 - `nodejs_compat` activado en `compatibility_flags` (requerido por drivers `pg`).
 - Sin `localConnectionString`: en local se usa la DB remota.
 - En código se consume vía `env.HYPERDRIVE.connectionString` (solo en server routes).
